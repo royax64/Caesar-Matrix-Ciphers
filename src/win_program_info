@@ -1,0 +1,28 @@
+
+pi...ia(1) Sobre los algoritmos de encriptación usados en el PIA. pi...ia(1)
+
+NAME
+       nuseradd - create a new LDAP user
+
+SYNOPSIS
+       nuseradd [USERNAME]
+
+DESCRIPTION
+       nuseradd is high level shell program for adding users to LDAP server.
+       On  Debian,  administrators should usually use nuseradd.debian(8) in‐
+       stead.
+
+OPTIONS
+       The nuseradd does not take any options. However, you can supply user‐
+       name.
+
+SEE ALSO
+       useradd(8), passwd(5), nuseradd.debian(8)
+
+BUGS
+       No known bugs.
+
+AUTOR
+       Rogel Axel Guel Lerma -> UANL FCFM -> 1957977
+
+1.0                       13 de Noviembre del 2023                pi...ia(1)

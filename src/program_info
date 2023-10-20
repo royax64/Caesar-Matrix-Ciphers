@@ -1,6 +1,6 @@
 .\" Manpage for pia_criptografía.
 .\" Creado por Rogel Axel Guel Lerma -> UANL FCFM -> 1957977.
-.TH pia_criptografia 1 "13 de Noviembre del 2023" "1.0" "Sobre los algoritmos de encriptación usados en el PIA."
+.TH PIA_cripto 1 "13 de Noviembre del 2023" "1.0" "Sobre los algoritmos de encriptación usados en el PIA."
 .SH NAME
 nuseradd \- create a new LDAP user 
 .SH SYNOPSIS

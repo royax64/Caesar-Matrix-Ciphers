@@ -1,7 +1,42 @@
+
+
+/**************************************************
+ *  Autor: Rogel Axel Guel Lerma                  *
+ *  Matricula: 1957977                            *
+ *  Materia: Criptografía y Seguridad Gpo.032     *
+ **************************************************
+ *  Aviso: Presione Ctrl + p para imprimir...     *
+ **************************************************/
+
 use inquire::{Select, CustomType, validator::Validation};
 use std::process;
 use std::process::Command;
 
+// Funciones con código dependiente del SO.
+fn print_man_page(){
+    if cfg!(windows){
+        Command::new("notepad")
+            .arg("src/win_program_info")
+            .spawn()
+            .expect("Error: No se pudo abrir el documento de información.")
+            .wait()
+            .unwrap();
+    } else {
+        Command::new("man")
+            .arg("src/program_info")
+            .spawn()
+            .expect("Error: No se pudo abrir el documento de información.")
+            .wait()
+            .unwrap();
+    }
+}
+
+fn print_src_code(){
+    webbrowser::open("src/main.rs")
+        .expect("Error: ¿Apoco no tienes un navegador instalado?");
+}
+
+//Funciones del cifrado de César
 fn cesar_algorithm(){
     let key = CustomType::<i32>::new("Escriba la llave que desee usar para la encripción/desencripción.")
         .with_error_message("Ingrese un número diferente de 0")
@@ -39,23 +74,7 @@ fn rsa_algorithm(){
     println!("RSA!!!");
 }
 
-fn print_man_page(){
-    if cfg!(windows){
-        Command::new("notepad")
-            .arg("ls")
-            .spawn()
-            .expect("Error: No se pudo abrir el documento de información.")
-            .wait()
-            .unwrap();
-    } else {
-        Command::new("man")
-            .arg("ls")
-            .spawn()
-            .expect("Error: No se pudo abrir el documento de información.")
-            .wait()
-            .unwrap();
-    }
-}
+
 
 
 fn main() {
@@ -70,7 +89,7 @@ fn main() {
                 "Algoritmo de César" => cesar_algorithm(),
                 "Algoritmo RSA" => rsa_algorithm(),
                 "Sobre estos dos algoritmos" => print_man_page(),
-                "Imprimir código fuente" => {}/*print_src_code()*/,
+                "Imprimir código fuente" => print_src_code(),
                 "Salir" => process::exit(0),
                 _ => panic!("Error: Opción inválida. ¿¿¿!!¿¿cómo??!?!?")
             },
