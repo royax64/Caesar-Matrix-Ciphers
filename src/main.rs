@@ -16,7 +16,7 @@ use std::process::Command;
 fn print_man_page(){
     if cfg!(windows){
         Command::new("notepad")
-            .arg("src/win_program_info")
+            .arg("src/win_program_info.txt")
             .spawn()
             .expect("Error: No se pudo abrir el documento de información.")
             .wait()
@@ -80,15 +80,15 @@ fn rsa_algorithm(){
 fn main() {
     loop {
         clearscreen::clear().expect("Error: No se pudo limpiar la pantalla.");
-        let algorithm_options: Vec<&str> = vec!["Algoritmo de César", "Algoritmo RSA", "Sobre estos dos algoritmos", "Imprimir código fuente", "Salir"];
-        let bienvenida = "Te damos la bienvenida a este PIA. Seleccione un método de encriptación:";
+        let algorithm_options: Vec<&str> = vec!["Algoritmo de César", "Algoritmo RSA", "Acerca de", "Imprimir código fuente", "Salir"];
+        let bienvenida = "Te damos la bienvenida a este PIA. Seleccione una opción o un algoritmo:";
         let selected = Select::new(&bienvenida, algorithm_options).prompt();
 
         match selected {
             Ok(ans) => match ans {
                 "Algoritmo de César" => cesar_algorithm(),
                 "Algoritmo RSA" => rsa_algorithm(),
-                "Sobre estos dos algoritmos" => print_man_page(),
+                "Acerca de" => print_man_page(),
                 "Imprimir código fuente" => print_src_code(),
                 "Salir" => process::exit(0),
                 _ => panic!("Error: Opción inválida. ¿¿¿!!¿¿cómo??!?!?")
