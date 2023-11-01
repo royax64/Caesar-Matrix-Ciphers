@@ -1,17 +1,121 @@
 .\" Manpage for pia_criptografía.
 .\" Creado por Rogel Axel Guel Lerma -> UANL FCFM -> 1957977.
-.TH PIA_cripto 1 "13 de Noviembre del 2023" "1.0" "Sobre los algoritmos de encriptación usados en el PIA."
-.SH NAME
-nuseradd \- create a new LDAP user 
-.SH SYNOPSIS
-nuseradd [USERNAME]
-.SH DESCRIPTION
-nuseradd is high level shell program for adding users to LDAP server.  On Debian, administrators should usually use nuseradd.debian(8) instead.
-.SH OPTIONS
-The nuseradd does not take any options. However, you can supply username.
-.SH SEE ALSO
-useradd(8), passwd(5), nuseradd.debian(8) 
-.SH BUGS
-No known bugs.
-.SH AUTOR
-Rogel Axel Guel Lerma -> UANL FCFM -> 1957977
+.TH PIA 1 "13 de Noviembre del 2023" "1.0" "Sobre los algoritmos de encriptación usados en el PIA."
+
+.SH ENCRIPTACIÓN DE CESAR
+
+.SS Tipo de encriptación
+Simétrica (una sola llave para encriptar y desencriptar)
+
+.SS Definición
+La encriptación de Cesar es la sustitución de las letras del alfabeto por otras, en este caso, desplazar las letras "k" (k será la llave) lugares hacia atrás, por ejemplo, si asignamos A = 0, B = 1, ..., Z = 25 entonces podemos escoger un número k = 1, entonces, al desplazar el alfabeto nos queda B = 0, C = 1, D = 2, ..., Z = 24, A = 25 (nótese cómo A queda al final del desplazamiento), para encriptar una frase se tiene que escoger el número K y luego sustituir las letras en base su indice; para desencriptar una frase basta con desplazar el alfabeto k lugares hacia adelante y repetir lo anterior.
+
+.SS Fórmula
+.B 
+.RE 
+Para cada letra de la cadena: c = (x + k) mod n 
+.IP "c: representación en número del caracter encriptado"
+.IP "x: representación en número de un caracter"
+.IP "k: la llave, número de desplazamientos"
+.IP "n: tamaño del alfabeto"
+
+.SS Ejemplo
+.IP "Definamos el alfabeto asignando un número a cada letra:"
+.B a = 0, b = 1, c = 2, d = 3, e = 4, ..., x = 23, y = 24, z = 25
+.PP
+Sea "hola" el mensaje en claro y k = 5 (desplazar 5 espacios)
+.IP "Se desplaza (sumar) el abecedario 5 espacios a la izquierda, recordando que se reinsertan al final las letras que caigan afuera."
+.B f = 0, g = 1, ..., z = 20, a = 21, b = 22, c = 23, d = 24, e = 25
+.IP "Los números que representan a 'hola' en el alfabeto en claro."
+.B h = 7, o = 14, l = 11, a = 0
+.IP "Serán sustituídos por las letras que tengan el mismo índice en el alfabeto de César."
+.B m = 7, t = 14, q = 11, f = 0
+.PP
+.B Mensaje encriptado = mtqf
+.PP 
+Para desencriptar, tomaremos cada letra del mensaje cifrado y "desharemos" el desplazamiento (restaremos 5 a su indice para regresar al mensaje en claro).
+.IP "Números correspondientes a cada letra encriptada en el alfabeto en claro:"
+.B m = 12, t = 19, q = 16, f = 5
+.IP "Restamos 5 a cada letra, este paso es el equivalente a desplazar al abecedario 5 espacios hacia adelante:"
+.I "Nota: Si al restar sale negativo, entonces vuelve a sumar 26 (tamaño del alfabeto): "
+.B m = 7, t = 14, q = 11, f = 0
+.IP "Encontrar cuáles letras tienen ese indice en el alfabeto en claro:"
+.B h = 7, o = 14, l = 11, a = 0
+.PP
+.B Mensaje desencriptado = hola
+
+.SH ENCRIPTACIÓN CON MATRICES
+
+.SS Tipo de encriptación
+Simétrica (una sola llave para encriptar y desencriptar)
+
+.SS Definición
+El cifrado de matrices utiliza matrices para realizar la encriptación y decriptación de la información, el cifrado en sí es sencillo, solamente se multiplican la matriz mensaje con la matriz llave y para decifrar solamente se multiplica la matriz encriptada con la inversa de la matriz llave. El cifrado de matrices es un algoritmo más seguro que el cifrado de César ya que no es trivial encontrar una matriz invertible que decripte un mensaje, en especial si las matrices son grandes.
+
+.SS Fórmula
+.B 
+.RE 
+Encripción: A * K = C		Desencripción: A = C * K^-1
+.IP "A: representación matricial del mensaje"
+.IP "K: representación matricial de la llave"
+.IP "K^-1: matriz inversa de K"
+.IP "C: representación matricial del mensaje encriptado"
+
+.SS Ejemplo
+.IP "Sea el mensaje en claro 'hola' y su representación matricial (maś abajo se detalla más sobre como representar una cadena en una matriz):"
+.B
+  ┌         ┐
+  │ 104 111 │
+  │ 108  97 │
+  └         ┘
+.IP "Sea la llave 'como' y esta otra representación matricial:"
+.B
+  ┌         ┐
+  │  99 111 │
+  │ 109 111 │
+  └         ┘
+.IP "La multiplicación de ambas matrices es el mensaje encriptado (en este programa, esta matriz se guarda en un archivo ya que no es posible convertir esta matriz en una cadena de texto)"
+.B
+  ┌             ┐
+  │ 22395 23865 │
+  │ 21265 22755 │
+  └             ┘
+.IP "Para desencriptar el mensaje será necesario conocer la llave (cuya representación matricial sea invertible, este programa comprueba este requisito): "
+.B
+  ┌         ┐
+  │  99 111 │
+  │ 109 111 │
+  └         ┘
+.IP "Esta es la inversa de la matriz llave:"
+.B
+  ┌                         ┐
+  │        -0.1         0.1 │
+  │   0.0981982 -0.08918919 │
+  └                         ┘
+.IP "Se multiplica el mensaje encriptado por la matriz inversa de la llave, su multiplicación será el mensaje en claro."
+.B
+  ┌         ┐
+  │ 104 111 │
+  │ 108  97 │
+  └         ┘
+.PP
+.B Mensaje desencriptado = hola
+
+.SS Implementación
+En la práctica este algoritmo no funciona con cadenas de texto y sino con matrices, en el programa al igual que el algoritmo de césar, se toman los bytes de cada caracter y se insertan en una matriz cuadrada (se rellenan con 0s si no se alcanza) para formar las matrices mensaje en claro y la matriz llave. Al momento de desencriptar, debido a las limitaciones de las computadoras es necesario redondear algunos valores decimales lo cual puede causar que se obtenga una desencripción incorrecta en los casos donde se inserte una llave incorrecta pero similar.
+
+.SH SOBRE EL AUTOR Y OTROS DATOS
+.SS Autor
+Rogel Axel Guel Lerma -> 1957977 -> Grupo 032 
+.SS Universidad
+Universidad Autónoma de Nuevo León
+.SS Facultad
+Facultad de Ciencias Físico-Matemáticas
+.SS Materia
+Criptografía y Seguridad
+.SS Profesor
+Prof. Angel Salvador Perez Blanco
+.SS Lugar
+San Nicolás de los Garza, Nuevo León, México
+
+

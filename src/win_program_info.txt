@@ -1,28 +1,585 @@
 
-pi...ia(1) Sobre los algoritmos de encriptación usados en el PIA. pi...ia(1)
+PIA(1)     Sobre los algoritmos de encriptación usados en el PIA.    PIA(1)
 
-NAME
-       nuseradd - create a new LDAP user
+ENCRIPTACIÓN DE CESAR
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
 
-SYNOPSIS
+   Definición
+       La encriptación de Cesar es ...
+
+   Ejemplo
        nuseradd [USERNAME]
 
-DESCRIPTION
-       nuseradd is high level shell program for adding users to LDAP server.
-       On  Debian,  administrators should usually use nuseradd.debian(8) in‐
-       stead.
+   Implementación
+       nuseradd  is  high  level  shell  program  for  adding users to LDAP
+       server.  On Debian, administrators should usually  use  nuseradd.de‐
+       bian(8) instead.
 
-OPTIONS
-       The nuseradd does not take any options. However, you can supply user‐
-       name.
+ENCRIPTACIÓN CON MATRICES
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
 
-SEE ALSO
-       useradd(8), passwd(5), nuseradd.debian(8)
+   Definición
+       La encriptación de matrices es cuando usas matrices para...
 
-BUGS
-       No known bugs.
+   Ejemplo
+         ┌         ┐
+         │ 104 111 │
+         │ 108  97 │
+         └         ┘ La siguiente matrix es el mensaje claro:
+         ┌         ┐
+         │  99 111 │
+         │ 109 111 │
+         └         ┘ Sea la llave esta otra matriz
+         ┌             ┐
+         │ 22395 23865 │
+         │ 21265 22755 │
+         └              ┘ La multiplicación de ambas matrices es el mensaje
+       encriptado. La manera para desencriptar la matriz  es  multiplicando
+       la matriz encriptada por la inversa de la matriz llave.
+         ┌             ┐
+         │ 22395 23865 │
+         │ 21265 22755 │
+         └             ┘ La siguiente matrix es el mensaje encriptado:
+         ┌                         ┐
+         │        -0.1         0.1 │
+         │   0.0981982 -0.08918919 │
+         └                         ┘ Esta es la inversa de la matriz llave.
+         ┌         ┐
+         │ 104 111 │
+         │ 108  97 │
+         └         ┘ Su multiplicación, el mensaje en claro.
 
-AUTOR
-       Rogel Axel Guel Lerma -> UANL FCFM -> 1957977
+   Implementación
+       Se  usó la librería (crust) de "nalgebra" para implementar funciones
+       de álgebra lineal, en específico para encontrar la  inversa  y  pro‐
+       ducto de dos matrices, necesarias para este programa.
 
-1.0                       13 de Noviembre del 2023                pi...ia(1)
+SOBRE EL AUTOR Y OTROS DATOS
+   Autor
+       Rogel Axel Guel Lerma -> 1957977 -> Grupo 032
+
+   Universidad
+       Universidad Autónoma de Nuevo León
+
+   Facultad
+       Facultad de Ciencias Físico-Matemáticas
+
+   Materia
+       Criptografía y Seguridad
+
+   Profesor
+       Prof. Angel Salvador Perez Blanco
+
+   Lugar
+       San Nicolás de los Garza, Nuevo León, México
+
+1.0                       13 de Noviembre del 2023                   PIA(1)
+
+PIA(1)     Sobre los algoritmos de encriptación usados en el PIA.     PIA(1)
+
+ENCRIPTACIÓN DE CESAR
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
+
+   Definición
+       La encriptación de Cesar es la sustitución de las letras del alfabeto
+       por  otras,  en este caso, desplazar las letras "k" (k será la llave)
+       lugares hacia atrás, por ejemplo, si asignamos A = 0, B = 1, ..., Z =
+       25 entonces podemos escoger un número k = 1, entonces,  al  desplazar
+       el  alfabeto  nos  queda  B  =  0,  C = 1, D = 2, ..., Z = 24, A = 25
+       (nótese cómo A queda al final del desplazamiento), para encriptar una
+       frase se tiene que escoger el número K y luego sustituir  las  letras
+       en base su indice; para desencriptar una frase basta con desplazar el
+       alfabeto k lugares hacia adelante y repetir lo anterior.
+
+   Fórmula
+       Para cada letra de la cadena: c = (x + k) mod n
+
+       c: representación en número del caracter encriptado
+
+       x: representación en número de un caracter
+
+       k: la llave, número de desplazamientos
+
+       n: tamaño del alfabeto
+
+   Ejemplo
+       Definamos el alfabeto asignando un número a cada letra:
+              a = 0, b = 1, c = 2, d = 3, e = 4, ..., x = 23, y = 24, z = 25
+
+       Sea "hola" el mensaje en claro y k = 5 (desplazar 5 espacios)
+
+       Se desplaza (sumar) el abecedario 5 espacios a la izquierda, recor‐
+       dando que se reinsertan al final las letras que caigan afuera.
+              f = 0, g = 1, ..., z = 20, a = 21, b = 22, c = 23, d = 24, e =
+              25
+
+       Los números que representan a
+              h = 7, o = 14, l = 11, a = 0
+
+       Serán sustituídos por las letras que tengan el mismo índice en el al‐
+       fabeto de César.
+              m = 7, t = 14, q = 11, f = 0
+
+       Mensaje encriptado = mtqf
+
+       Para  desencriptar,  tomaremos  cada letra del mensaje cifrado y "de‐
+       sharemos" el desplazamiento (restaremos 5 a su indice  para  regresar
+       al mensaje en claro).
+
+       Números correspondientes a cada letra encriptada en el alfabeto en
+       claro:
+              m = 12, t = 19, q = 16, f = 5
+
+       Restamos 5 a cada letra, este paso es el equivalente a desplazar al
+       abecedario 5 espacios hacia adelante:
+              Nota:  Si  al restar sale negativo, entonces vuelve a sumar 26
+              (tamaño del alfabeto): m = 7, t = 14, q = 11, f = 0
+
+       Encontrar cuáles letras tienen ese indice en el alfabeto en claro:
+              h = 7, o = 14, l = 11, a = 0
+
+       Mensaje desencriptado = hola
+
+ENCRIPTACIÓN CON MATRICES
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
+
+   Definición
+       El cifrado de matrices utiliza matrices para realizar la encriptación
+       y decriptación de la información, el cifrado en sí es sencillo, sola‐
+       mente se multiplican la matriz mensaje con la matriz llave y para de‐
+       cifrar solamente se multiplica la matriz encriptada con la inversa de
+       la matriz llave. El cifrado de matrices es un  algoritmo  más  seguro
+       que el cifrado de César ya que no es trivial encontrar una matriz in‐
+       vertible  que  decripte  un  mensaje, en especial si las matrices son
+       grandes.
+
+   Fórmula
+       Encripción: A * K = C         Desencripción: A = C * K^-1
+
+       A: representación matricial del mensaje
+
+       K: representación matricial de la llave
+
+       K^-1: matriz inversa de K
+
+       C: representación matricial del mensaje encriptado
+
+   Ejemplo
+       Sea el mensaje en claro -hola- y su representación matricial (maś
+       abajo se detalla más sobre como representar una cadena en una ma‐
+       triz):
+                ┌         ┐
+                │ 104 111 │
+                │ 108  97 │
+                └         ┘
+
+       Sea la llave -como- y esta otra representación matricial:
+                ┌         ┐
+                │  99 111 │
+                │ 109 111 │
+                └         ┘
+
+       La multiplicación de ambas matrices es el mensaje encriptado (en este
+       programa, esta matriz se guarda en un archivo ya que no es posible
+       convertir esta matriz en una cadena de texto)
+                ┌             ┐
+                │ 22395 23865 │
+                │ 21265 22755 │
+                └             ┘
+
+       Para desencriptar el mensaje será necesario conocer la llave (cuya
+       representación matricial sea invertible, este programa comprueba este
+       requisito):
+                ┌         ┐
+                │  99 111 │
+                │ 109 111 │
+                └         ┘
+
+       Esta es la inversa de la matriz llave:
+                ┌                         ┐
+                │        -0.1         0.1 │
+                │   0.0981982 -0.08918919 │
+                └                         ┘
+
+       Se multiplica el mensaje encriptado por la matriz inversa de la
+       llave, su multiplicación será el mensaje en claro.
+                ┌         ┐
+                │ 104 111 │
+                │ 108  97 │
+                └         ┘
+
+       Mensaje desencriptado = hola
+
+   Implementación
+       En la práctica este algoritmo no funciona con cadenas de texto y sino
+       con matrices, en el programa al igual que el algoritmo de  césar,  se
+       toman los bytes de cada caracter y se insertan en una matriz cuadrada
+       (se  rellenan  con 0s si no se alcanza) para formar las matrices men‐
+       saje en claro y la matriz llave. Al momento de desencriptar, debido a
+       las limitaciones de las computadoras es necesario  redondear  algunos
+       valores  decimales  lo  cual  puede  causar que se obtenga una desen‐
+       cripción incorrecta en los casos donde se inserte  una  llave  incor‐
+       recta pero similar.
+
+SOBRE EL AUTOR Y OTROS DATOS
+   Autor
+       Rogel Axel Guel Lerma -> 1957977 -> Grupo 032
+
+   Universidad
+       Universidad Autónoma de Nuevo León
+
+   Facultad
+       Facultad de Ciencias Físico-Matemáticas
+
+   Materia
+       Criptografía y Seguridad
+
+   Profesor
+       Prof. Angel Salvador Perez Blanco
+
+   Lugar
+       San Nicolás de los Garza, Nuevo León, México
+
+1.0                       13 de Noviembre del 2023                    PIA(1)
+
+PIA(1)     Sobre los algoritmos de encriptación usados en el PIA.     PIA(1)
+
+ENCRIPTACIÓN DE CESAR
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
+
+   Definición
+       La encriptación de Cesar es la sustitución de las letras del alfabeto
+       por  otras,  en este caso, desplazar las letras "k" (k será la llave)
+       lugares hacia atrás, por ejemplo, si asignamos A = 0, B = 1, ..., Z =
+       25 entonces podemos escoger un número k = 1, entonces,  al  desplazar
+       el  alfabeto  nos  queda  B  =  0,  C = 1, D = 2, ..., Z = 24, A = 25
+       (nótese cómo A queda al final del desplazamiento), para encriptar una
+       frase se tiene que escoger el número K y luego sustituir  las  letras
+       en base su indice; para desencriptar una frase basta con desplazar el
+       alfabeto k lugares hacia adelante y repetir lo anterior.
+
+   Fórmula
+       Para cada letra de la cadena: c = (x + k) mod n
+
+       c: representación en número del caracter encriptado
+
+       x: representación en número de un caracter
+
+       k: la llave, número de desplazamientos
+
+       n: tamaño del alfabeto
+
+   Ejemplo
+       Definamos el alfabeto asignando un número a cada letra:
+              a = 0, b = 1, c = 2, d = 3, e = 4, ..., x = 23, y = 24, z = 25
+
+       Sea "hola" el mensaje en claro y k = 5 (desplazar 5 espacios)
+
+       Se desplaza (sumar) el abecedario 5 espacios a la izquierda, recor‐
+       dando que se reinsertan al final las letras que caigan afuera.
+              f = 0, g = 1, ..., z = 20, a = 21, b = 22, c = 23, d = 24, e =
+              25
+
+       Los números que representan a
+              h = 7, o = 14, l = 11, a = 0
+
+       Serán sustituídos por las letras que tengan el mismo índice en el al‐
+       fabeto de César.
+              m = 7, t = 14, q = 11, f = 0
+
+       Mensaje encriptado = mtqf
+
+       Para  desencriptar,  tomaremos  cada letra del mensaje cifrado y "de‐
+       sharemos" el desplazamiento (restaremos 5 a su indice  para  regresar
+       al mensaje en claro).
+
+       Números correspondientes a cada letra encriptada en el alfabeto en
+       claro:
+              m = 12, t = 19, q = 16, f = 5
+
+       Restamos 5 a cada letra, este paso es el equivalente a desplazar al
+       abecedario 5 espacios hacia adelante:
+              Nota:  Si  al restar sale negativo, entonces vuelve a sumar 26
+              (tamaño del alfabeto): m = 7, t = 14, q = 11, f = 0
+
+       Encontrar cuáles letras tienen ese indice en el alfabeto en claro:
+              h = 7, o = 14, l = 11, a = 0
+
+       Mensaje desencriptado = hola
+
+ENCRIPTACIÓN CON MATRICES
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
+
+   Definición
+       El cifrado de matrices utiliza matrices para realizar la encriptación
+       y decriptación de la información, el cifrado en sí es sencillo, sola‐
+       mente se multiplican la matriz mensaje con la matriz llave y para de‐
+       cifrar solamente se multiplica la matriz encriptada con la inversa de
+       la matriz llave. El cifrado de matrices es un  algoritmo  más  seguro
+       que el cifrado de César ya que no es trivial encontrar una matriz in‐
+       vertible  que  decripte  un  mensaje, en especial si las matrices son
+       grandes.
+
+   Fórmula
+       Encripción: A * K = C         Desencripción: A = C * K^-1
+
+       A: representación matricial del mensaje
+
+       K: representación matricial de la llave
+
+       K^-1: matriz inversa de K
+
+       C: representación matricial del mensaje encriptado
+
+   Ejemplo
+       Sea el mensaje en claro -hola- y su representación matricial (maś
+       abajo se detalla más sobre como representar una cadena en una ma‐
+       triz):
+                ┌         ┐
+                │ 104 111 │
+                │ 108  97 │
+                └         ┘
+
+       Sea la llave -como- y esta otra representación matricial:
+                ┌         ┐
+                │  99 111 │
+                │ 109 111 │
+                └         ┘
+
+       La multiplicación de ambas matrices es el mensaje encriptado (en este
+       programa, esta matriz se guarda en un archivo ya que no es posible
+       convertir esta matriz en una cadena de texto)
+                ┌             ┐
+                │ 22395 23865 │
+                │ 21265 22755 │
+                └             ┘
+
+       Para desencriptar el mensaje será necesario conocer la llave (cuya
+       representación matricial sea invertible, este programa comprueba este
+       requisito):
+                ┌         ┐
+                │  99 111 │
+                │ 109 111 │
+                └         ┘
+
+       Esta es la inversa de la matriz llave:
+                ┌                         ┐
+                │        -0.1         0.1 │
+                │   0.0981982 -0.08918919 │
+                └                         ┘
+
+       Se multiplica el mensaje encriptado por la matriz inversa de la
+       llave, su multiplicación será el mensaje en claro.
+                ┌         ┐
+                │ 104 111 │
+                │ 108  97 │
+                └         ┘
+
+       Mensaje desencriptado = hola
+
+   Implementación
+       En la práctica este algoritmo no funciona con cadenas de texto y sino
+       con matrices, en el programa al igual que el algoritmo de  césar,  se
+       toman los bytes de cada caracter y se insertan en una matriz cuadrada
+       (se  rellenan  con 0s si no se alcanza) para formar las matrices men‐
+       saje en claro y la matriz llave. Al momento de desencriptar, debido a
+       las limitaciones de las computadoras es necesario  redondear  algunos
+       valores  decimales  lo  cual  puede  causar que se obtenga una desen‐
+       cripción incorrecta en los casos donde se inserte  una  llave  incor‐
+       recta pero similar.
+
+SOBRE EL AUTOR Y OTROS DATOS
+   Autor
+       Rogel Axel Guel Lerma -> 1957977 -> Grupo 032
+
+   Universidad
+       Universidad Autónoma de Nuevo León
+
+   Facultad
+       Facultad de Ciencias Físico-Matemáticas
+
+   Materia
+       Criptografía y Seguridad
+
+   Profesor
+       Prof. Angel Salvador Perez Blanco
+
+   Lugar
+       San Nicolás de los Garza, Nuevo León, México
+
+1.0                       13 de Noviembre del 2023                    PIA(1)
+
+PIA(1)     Sobre los algoritmos de encriptación usados en el PIA.     PIA(1)
+
+ENCRIPTACIÓN DE CESAR
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
+
+   Definición
+       La encriptación de Cesar es la sustitución de las letras del alfabeto
+       por  otras,  en este caso, desplazar las letras "k" (k será la llave)
+       lugares hacia atrás, por ejemplo, si asignamos A = 0, B = 1, ..., Z =
+       25 entonces podemos escoger un número k = 1, entonces,  al  desplazar
+       el  alfabeto  nos  queda  B  =  0,  C = 1, D = 2, ..., Z = 24, A = 25
+       (nótese cómo A queda al final del desplazamiento), para encriptar una
+       frase se tiene que escoger el número K y luego sustituir  las  letras
+       en base su indice; para desencriptar una frase basta con desplazar el
+       alfabeto k lugares hacia adelante y repetir lo anterior.
+
+   Fórmula
+       Para cada letra de la cadena: c = (x + k) mod n
+
+       c: representación en número del caracter encriptado
+
+       x: representación en número de un caracter
+
+       k: la llave, número de desplazamientos
+
+       n: tamaño del alfabeto
+
+   Ejemplo
+       Definamos el alfabeto asignando un número a cada letra:
+              a = 0, b = 1, c = 2, d = 3, e = 4, ..., x = 23, y = 24, z = 25
+
+       Sea "hola" el mensaje en claro y k = 5 (desplazar 5 espacios)
+
+       Se desplaza (sumar) el abecedario 5 espacios a la izquierda, recor‐
+       dando que se reinsertan al final las letras que caigan afuera.
+              f = 0, g = 1, ..., z = 20, a = 21, b = 22, c = 23, d = 24, e =
+              25
+
+       Los números que representan a 'hola' en el alfabeto en claro.
+              h = 7, o = 14, l = 11, a = 0
+
+       Serán sustituídos por las letras que tengan el mismo índice en el al‐
+       fabeto de César.
+              m = 7, t = 14, q = 11, f = 0
+
+       Mensaje encriptado = mtqf
+
+       Para  desencriptar,  tomaremos  cada letra del mensaje cifrado y "de‐
+       sharemos" el desplazamiento (restaremos 5 a su indice  para  regresar
+       al mensaje en claro).
+
+       Números correspondientes a cada letra encriptada en el alfabeto en
+       claro:
+              m = 12, t = 19, q = 16, f = 5
+
+       Restamos 5 a cada letra, este paso es el equivalente a desplazar al
+       abecedario 5 espacios hacia adelante:
+              Nota:  Si  al restar sale negativo, entonces vuelve a sumar 26
+              (tamaño del alfabeto): m = 7, t = 14, q = 11, f = 0
+
+       Encontrar cuáles letras tienen ese indice en el alfabeto en claro:
+              h = 7, o = 14, l = 11, a = 0
+
+       Mensaje desencriptado = hola
+
+ENCRIPTACIÓN CON MATRICES
+   Tipo de encriptación
+       Simétrica (una sola llave para encriptar y desencriptar)
+
+   Definición
+       El cifrado de matrices utiliza matrices para realizar la encriptación
+       y decriptación de la información, el cifrado en sí es sencillo, sola‐
+       mente se multiplican la matriz mensaje con la matriz llave y para de‐
+       cifrar solamente se multiplica la matriz encriptada con la inversa de
+       la matriz llave. El cifrado de matrices es un  algoritmo  más  seguro
+       que el cifrado de César ya que no es trivial encontrar una matriz in‐
+       vertible  que  decripte  un  mensaje, en especial si las matrices son
+       grandes.
+
+   Fórmula
+       Encripción: A * K = C         Desencripción: A = C * K^-1
+
+       A: representación matricial del mensaje
+
+       K: representación matricial de la llave
+
+       K^-1: matriz inversa de K
+
+       C: representación matricial del mensaje encriptado
+
+   Ejemplo
+       Sea el mensaje en claro 'hola' y su representación matricial (maś
+       abajo se detalla más sobre como representar una cadena en una ma‐
+       triz):
+                ┌         ┐
+                │ 104 111 │
+                │ 108  97 │
+                └         ┘
+
+       Sea la llave 'como' y esta otra representación matricial:
+                ┌         ┐
+                │  99 111 │
+                │ 109 111 │
+                └         ┘
+
+       La multiplicación de ambas matrices es el mensaje encriptado (en este
+       programa, esta matriz se guarda en un archivo ya que no es posible
+       convertir esta matriz en una cadena de texto)
+                ┌             ┐
+                │ 22395 23865 │
+                │ 21265 22755 │
+                └             ┘
+
+       Para desencriptar el mensaje será necesario conocer la llave (cuya
+       representación matricial sea invertible, este programa comprueba este
+       requisito):
+                ┌         ┐
+                │  99 111 │
+                │ 109 111 │
+                └         ┘
+
+       Esta es la inversa de la matriz llave:
+                ┌                         ┐
+                │        -0.1         0.1 │
+                │   0.0981982 -0.08918919 │
+                └                         ┘
+
+       Se multiplica el mensaje encriptado por la matriz inversa de la
+       llave, su multiplicación será el mensaje en claro.
+                ┌         ┐
+                │ 104 111 │
+                │ 108  97 │
+                └         ┘
+
+       Mensaje desencriptado = hola
+
+   Implementación
+       En la práctica este algoritmo no funciona con cadenas de texto y sino
+       con matrices, en el programa al igual que el algoritmo de  césar,  se
+       toman los bytes de cada caracter y se insertan en una matriz cuadrada
+       (se  rellenan  con 0s si no se alcanza) para formar las matrices men‐
+       saje en claro y la matriz llave. Al momento de desencriptar, debido a
+       las limitaciones de las computadoras es necesario  redondear  algunos
+       valores  decimales  lo  cual  puede  causar que se obtenga una desen‐
+       cripción incorrecta en los casos donde se inserte  una  llave  incor‐
+       recta pero similar.
+
+SOBRE EL AUTOR Y OTROS DATOS
+   Autor
+       Rogel Axel Guel Lerma -> 1957977 -> Grupo 032
+
+   Universidad
+       Universidad Autónoma de Nuevo León
+
+   Facultad
+       Facultad de Ciencias Físico-Matemáticas
+
+   Materia
+       Criptografía y Seguridad
+
+   Profesor
+       Prof. Angel Salvador Perez Blanco
+
+   Lugar
+       San Nicolás de los Garza, Nuevo León, México
+
+1.0                       13 de Noviembre del 2023                    PIA(1)
